@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverActions: true // Si planeas usar Server Actions
+    serverActions: true
   },
   eslint: {
     ignoreDuringBuilds: true
   },
   images: {
-    domains: ['res.cloudinary.com'] // Dominios para imágenes
+    domains: ['res.cloudinary.com']
   },
   reactStrictMode: true,
   env: {
