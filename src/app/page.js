@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { PlusCircleIcon, UsersIcon } from '@heroicons/react/24/outline'
+export const dynamic = 'force-dynamic'
 
 async function checkHostsExist() {
   try {
