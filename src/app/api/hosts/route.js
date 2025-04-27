@@ -47,7 +47,11 @@ export async function POST(request) {
 
     return NextResponse.json({ ...newHost._doc, _id: newHost._id.toString() }, { status: 201 })
   } catch (error) {
-    console.error('Error creating host:', error)
+    console.error('Error detallado:', {
+      message: error.message,
+      stack: error.stack,
+      body: body
+    })
     return NextResponse.json(
       { error: 'Error creating host', details: error.message },
       { status: 500 }
