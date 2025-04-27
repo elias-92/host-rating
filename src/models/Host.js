@@ -1,35 +1,3 @@
-// import mongoose from 'mongoose'
-
-// const hostSchema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: true,
-//     trim: true
-//   },
-//   description: {
-//     type: String,
-//     trim: true
-//   },
-//   photo: {
-//     type: String,
-//     default: ''
-//   },
-//   averageRating: {
-//     type: Number,
-//     default: 0,
-//     min: 0,
-//     max: 5
-//   },
-//   createdAt: {
-//     type: Date,
-//     default: Date.now
-//   }
-// })
-
-// // Actualiza el índice para búsquedas eficientes
-// hostSchema.index({ name: 'text', description: 'text' })
-
-// export default mongoose.models.Host || mongoose.model('Host', hostSchema)
 import mongoose from 'mongoose'
 
 const hostSchema = new mongoose.Schema({

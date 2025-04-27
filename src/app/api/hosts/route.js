@@ -10,7 +10,7 @@ export async function GET() {
     const hosts = await Host.find({})
       .sort({ createdAt: -1 }) // Ordenar por más recientes primero
       .lean() // Convertir a objetos planos
-
+    console.log('Hosts encontrados:', hosts)
     // Convertir ObjectId a string y asegurar averageRating
     const formattedHosts = hosts.map((host) => ({
       ...host,
