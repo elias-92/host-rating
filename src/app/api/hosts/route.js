@@ -8,10 +8,8 @@ export async function GET() {
     await dbConnect()
 
     const hosts = await Host.find({})
-      .sort({ createdAt: -1 }) // Ordenar por más recientes primero
-      .lean() // Convertir a objetos planos
-    console.log('Hosts encontrados:', hosts)
-    // Convertir ObjectId a string y asegurar averageRating
+      .sort({ createdAt: -1 })
+      .lean() 
     const formattedHosts = hosts.map((host) => ({
       ...host,
       _id: host._id.toString(),
@@ -27,35 +25,69 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    await dbConnect()
-    const body = await request.json()
+    const contentType = request.headers.get('content-type') || ''
 
-    // Validación básica
-    if (!body.name) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+    if (contentType.includes('application/json')) {
+      const body = await request.json()
+
+      if (!body.name) {
+        return NextResponse.json({ error: "El campo 'name' es requerido" }, { status: 400 })
+      }
+
+      // procesar JSON normalmente
+      await dbConnect()
+
+      const newHost = await Host.create({
+        name: body.name,
+        description: body.description || '',
+        photo: body.photo || '',
+        foodRating: body.foodRating || 0,
+        ambianceRating: body.ambianceRating || 0,
+        serviceRating: body.serviceRating || 0,
+        averageRating: calculateAverage(body.foodRating, body.ambianceRating, body.serviceRating)
+      })
+
+      return NextResponse.json(
+        { ...newHost.toObject(), _id: newHost._id.toString() },
+        { status: 201 }
+      )
+    } else if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData()
+
+      const name = formData.get('name')
+      const description = formData.get('description') || ''
+      const photo = formData.get('photo') || ''
+      const foodRating = Number(formData.get('foodRating') || 0)
+      const ambianceRating = Number(formData.get('ambianceRating') || 0)
+      const serviceRating = Number(formData.get('serviceRating') || 0)
+
+      if (!name) {
+        return NextResponse.json({ error: "El campo 'name' es requerido" }, { status: 400 })
+      }
+
+      await dbConnect()
+
+      const newHost = await Host.create({
+        name,
+        description,
+        photo,
+        foodRating,
+        ambianceRating,
+        serviceRating,
+        averageRating: calculateAverage(foodRating, ambianceRating, serviceRating)
+      })
+
+      return NextResponse.json(
+        { ...newHost.toObject(), _id: newHost._id.toString() },
+        { status: 201 }
+      )
+    } else {
+      return NextResponse.json({ error: 'Content-Type no soportado' }, { status: 415 })
     }
-
-    const newHost = await Host.create({
-      name: body.name,
-      description: body.description || '',
-      photo: body.photo || '',
-      foodRating: body.foodRating || 0,
-      ambianceRating: body.ambianceRating || 0,
-      serviceRating: body.serviceRating || 0,
-      averageRating: calculateAverage(body.foodRating, body.ambianceRating, body.serviceRating)
-    })
-
-    return NextResponse.json({ ...newHost._doc, _id: newHost._id.toString() }, { status: 201 })
   } catch (error) {
-    console.error('Error detallado:', {
-      message: error.message,
-      stack: error.stack,
-      body: body
-    })
-    return NextResponse.json(
-      { error: 'Error creating host', details: error.message },
-      { status: 500 }
-    )
+    console.error('Error completo:', error)
+
+    return NextResponse.json({ error: 'Error al crear anfitrión' }, { status: 500 })
   }
 }
 
